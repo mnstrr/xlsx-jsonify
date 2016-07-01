@@ -1,5 +1,4 @@
-#import xlrd
-
+import openpyxl
 class SearchAndReplace:
 
 	def __init__(self):
