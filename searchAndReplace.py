@@ -49,10 +49,10 @@ class SearchAndReplace:
                 self.___naivereplacement(text, translation)
 
     def __replaceJson(self):
-        testStr = "i-Dos"
+        testStr = "Home Stories"
         testStr2 = ftfy.fix_encoding(testStr)
         replaceStr = "TROLOLO"
-        json_data = open('data.json')
+        json_data = open(self.__json_doc, encoding="utf8")
         jdata = json.load(json_data)
 
         self.__checkdict(jdata, testStr2, replaceStr)
@@ -62,7 +62,7 @@ class SearchAndReplace:
             self.__checkitem(collection[key], k, v)
 
     def __checklist(self, collection, k, v):
-        for item in collection:
+        for index, item in enumerate(collection):
             self.__checkitem(item, k, v)
 
     def __checkitem(self, item, k, v):
