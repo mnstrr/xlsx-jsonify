@@ -62,8 +62,8 @@ class SearchAndReplace:
             self.__checkitem(collection[key], k, v)
 
     def __checklist(self, collection, k, v):
-        for index, item in enumerate(collection):
-            self.__checkitem(item, k, v)
+        for index in range(len(collection)):
+            self.__checkitem(collection[index], k, v)
 
     def __checkitem(self, item, k, v):
         if type(item) is str:
