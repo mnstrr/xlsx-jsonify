@@ -2,7 +2,7 @@ import openpyxl
 import json
 import ftfy
 import pp
-
+import codecs
 
 class SearchAndReplace:
     def __init__(self, xlsx_doc, json_doc, json_doc_new, sheet_name, blacklist):
@@ -62,8 +62,9 @@ class SearchAndReplace:
         newcollection = self.__checkdict(data2, testStr2, replaceStr)
         pp(newcollection)
 
-        with open('dataNEW.json', 'w') as fp:
-            json.dump(newcollection, fp, sort_keys=True, indent=2)
+        output_file = codecs.open("output_file.json", "w", encoding="utf-8")
+        json.dump(newcollection, output_file, indent=4, sort_keys=True, ensure_ascii=False)
+
 
     def __checkdict(self, collection, k, v):
         collectiontemp = collection
