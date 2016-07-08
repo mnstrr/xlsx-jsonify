@@ -1,6 +1,7 @@
 import openpyxl
 import json
 import ftfy
+import pp
 
 
 class SearchAndReplace:
@@ -11,6 +12,8 @@ class SearchAndReplace:
         self.__json_doc_new = json_doc_new
         self.__sheet_name = sheet_name
         self.__blacklist = blacklist
+
+        self.__jadata = {}
 
         self.__data = ""
         self.__newdata = ""
@@ -53,26 +56,46 @@ class SearchAndReplace:
         testStr2 = ftfy.fix_encoding(testStr)
         replaceStr = "TROLOLO"
         json_data = open(self.__json_doc, encoding="utf8")
-        jdata = json.load(json_data)
 
-        self.__checkdict(jdata, testStr2, replaceStr)
+        data2 = json.load(json_data)
+
+        newcollection = self.__checkdict(data2, testStr2, replaceStr)
+        pp(newcollection)
+
+        with open('dataNEW.json', 'w') as fp:
+            json.dump(newcollection, fp, sort_keys=True, indent=2)
 
     def __checkdict(self, collection, k, v):
-        for key in collection.keys():
-            self.__checkitem(collection[key], k, v)
+        collectiontemp = collection
+        for index in collectiontemp.keys():
+            collectiontemp[index] = self.__checkitem(collectiontemp, k, v, index)
+        return collectiontemp
 
     def __checklist(self, collection, k, v):
-        for index in range(len(collection)):
-            self.__checkitem(collection[index], k, v)
+        collectiontemp = collection
+        for index in range(len(collectiontemp)):
+            collectiontemp[index] = self.__checkitem(collectiontemp, k, v, index)
+        return collectiontemp
 
-    def __checkitem(self, item, k, v):
+    def __checkitem(self, collection, k, v, index):
+        collectiontemp = collection
+        item = collectiontemp[index]
         if type(item) is str:
             if ftfy.fix_encoding(item) == k:
-              self.__replaceitem(item)
+                collectiontemp2 = collectiontemp
+                collectiontemp2[index] == v
+                print(collectiontemp2[index])
+                return ftfy.fix_encoding(v)
+            else:
+                return ftfy.fix_encoding(item)
         if type(item) is dict:
-            self.__checkdict(item, k, v)
+            collectiontemp = self.__checkdict(item, k, v)
         if type(item) is list:
-            self.__checklist(item, k, v)
+            collectiontemp = self.__checklist(item, k, v)
+        if type(item) is int or type(item) is float:
+            return item
+
+        return collectiontemp
 
     def __replaceitem(self, item):
         print("FOUND YOU: ", ftfy.fix_encoding(item))
