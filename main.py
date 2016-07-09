@@ -4,8 +4,9 @@ from searchAndReplace import SearchAndReplace as Sar
 
 class Main:
     xlxs_doc = 'translation2.xlsx'
-    json_doc = 'translation.json'
-    json_doc_new = 'translation_new.json'
+    json_doc = 'data.json'
+    json_doc_new = 'data_new.json'
+    json_doc_new = 'data_new.json'
     sheet_name = 'sheet1'
     blacklist = ['']
 

@@ -4,37 +4,30 @@ import ftfy
 import pp
 import codecs
 
+
 class SearchAndReplace:
     def __init__(self, xlsx_doc, json_doc, json_doc_new, sheet_name, blacklist):
-        print('init SearchAndReplace')
         self.__xlsx_doc = xlsx_doc
         self.__json_doc = json_doc
         self.__json_doc_new = json_doc_new
         self.__sheet_name = sheet_name
         self.__blacklist = blacklist
-
-        self.__jadata = {}
-
         self.__data = ""
         self.__newdata = ""
 
-        self.__replaceJson()
-        # self.__main()
+        self.__main()
 
     def __main(self):
-        f = open(self.__json_doc, 'r')
-        self.__data = f.read()
-        f.close()
 
+        json_data = open(self.__json_doc, encoding="utf8")
+
+        self.__data = json.load(json_data)
         self.__newdata = self.__data
 
         self.__crawlexcel()
 
-        print(self.__newdata)
-
-        f = open(self.__json_doc_new, 'w')
-        f.write(self.__newdata)
-        f.close()
+        output_file = codecs.open(self.__json_doc_new, "w", encoding="utf8")
+        json.dump(self.__newdata, output_file, indent=4, sort_keys=True, ensure_ascii=False)
 
     def __crawlexcel(self):
         print('start search')
@@ -46,25 +39,9 @@ class SearchAndReplace:
             text = sheet.cell(row=rowNum, column=5).value
             translation = sheet.cell(row=rowNum, column=6).value
             if text is not None and translation is not None:
-                # print(searchTerm)
-
-                print(text, translation)
-                self.___naivereplacement(text, translation)
-
-    def __replaceJson(self):
-        testStr = "Home Stories"
-        testStr2 = ftfy.fix_encoding(testStr)
-        replaceStr = "TROLOLO"
-        json_data = open(self.__json_doc, encoding="utf8")
-
-        data2 = json.load(json_data)
-
-        newcollection = self.__checkdict(data2, testStr2, replaceStr)
-        pp(newcollection)
-
-        output_file = codecs.open("output_file.json", "w", encoding="utf-8")
-        json.dump(newcollection, output_file, indent=4, sort_keys=True, ensure_ascii=False)
-
+                searchstring = ftfy.fix_encoding(text).lower().replace(" ", "").replace("\"", "")
+                replacestring = ftfy.fix_encoding(translation)
+                self.__newdata = self.__checkdict(self.__newdata, searchstring, replacestring)
 
     def __checkdict(self, collection, k, v):
         collectiontemp = collection
@@ -82,7 +59,7 @@ class SearchAndReplace:
         collectiontemp = collection
         item = collectiontemp[index]
         if type(item) is str:
-            if ftfy.fix_encoding(item) == k:
+            if ftfy.fix_encoding(item).lower().replace(" ", "").replace("\"", "") == k:
                 collectiontemp2 = collectiontemp
                 collectiontemp2[index] == v
                 print(collectiontemp2[index])
@@ -97,9 +74,6 @@ class SearchAndReplace:
             return item
 
         return collectiontemp
-
-    def __replaceitem(self, item):
-        print("FOUND YOU: ", ftfy.fix_encoding(item))
 
     def ___naivereplacement(self, text, translation):
         self.__newdata = self.__newdata.replace(text, translation)
