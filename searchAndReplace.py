@@ -43,7 +43,7 @@ class SearchAndReplace:
         sheet = wb.get_sheet_by_name(self.__sheet_name)
 
         for rowNum in range(2, sheet.max_row):  # skip the first row
-            progress = int(round((rowNum/(sheet.max_row-2))*100))
+            progress = int(round((rowNum / (sheet.max_row - 2)) * 100))
             self.__update_progress(progress)
             text = sheet.cell(row=rowNum, column=self.__searchcolumn).value
             translation = sheet.cell(row=rowNum, column=self.__replacecolumn).value
@@ -86,5 +86,4 @@ class SearchAndReplace:
         self.__newdata = self.__newdata.replace(text, translation)
 
     def __update_progress(self, progress):
-        #print(progress, end="")
         print('\r[{0:10}]{1:>2}%'.format('#' * int(progress * 10 / 100), progress), end='')
