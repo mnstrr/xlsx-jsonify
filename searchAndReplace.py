@@ -1,17 +1,20 @@
 import openpyxl
 import json
 import ftfy
-import pp
 import codecs
+import warnings
 
 
 class SearchAndReplace:
-    def __init__(self, xlsx_doc, json_doc, json_doc_new, sheet_name, blacklist):
+    def __init__(self, xlsx_doc, json_doc, json_doc_new, sheet_name, searchcolumn, replacecolumn, blacklist):
         self.__xlsx_doc = xlsx_doc
         self.__json_doc = json_doc
         self.__json_doc_new = json_doc_new
         self.__sheet_name = sheet_name
+        self.__searchcolumn = searchcolumn
+        self.__replacecolumn = replacecolumn
         self.__blacklist = blacklist
+        self.__counter = 0
         self.__data = ""
         self.__newdata = ""
 
@@ -24,20 +27,26 @@ class SearchAndReplace:
         self.__data = json.load(json_data)
         self.__newdata = self.__data
 
+        print('Starting search and replace. Hold your horses.')
         self.__crawlexcel()
 
         output_file = codecs.open(self.__json_doc_new, "w", encoding="utf8")
         json.dump(self.__newdata, output_file, indent=4, sort_keys=True, ensure_ascii=False)
 
-    def __crawlexcel(self):
-        print('start search')
+        print(' New jsonfile \"' + self.__json_doc_new + '" was created. ' + str(
+            self.__counter) + ' substitutions in total.')
 
+    def __crawlexcel(self):
+
+        warnings.simplefilter("ignore")
         wb = openpyxl.load_workbook(self.__xlsx_doc)
         sheet = wb.get_sheet_by_name(self.__sheet_name)
 
         for rowNum in range(2, sheet.max_row):  # skip the first row
-            text = sheet.cell(row=rowNum, column=5).value
-            translation = sheet.cell(row=rowNum, column=6).value
+            progress = int(round((rowNum/(sheet.max_row-2))*100))
+            self.__update_progress(progress)
+            text = sheet.cell(row=rowNum, column=self.__searchcolumn).value
+            translation = sheet.cell(row=rowNum, column=self.__replacecolumn).value
             if text is not None and translation is not None:
                 searchstring = ftfy.fix_encoding(text).lower().replace(" ", "").replace("\"", "")
                 replacestring = ftfy.fix_encoding(translation)
@@ -60,9 +69,7 @@ class SearchAndReplace:
         item = collectiontemp[index]
         if type(item) is str:
             if ftfy.fix_encoding(item).lower().replace(" ", "").replace("\"", "") == k:
-                collectiontemp2 = collectiontemp
-                collectiontemp2[index] == v
-                print(collectiontemp2[index])
+                self.__counter += 1
                 return ftfy.fix_encoding(v)
             else:
                 return ftfy.fix_encoding(item)
@@ -77,3 +84,7 @@ class SearchAndReplace:
 
     def ___naivereplacement(self, text, translation):
         self.__newdata = self.__newdata.replace(text, translation)
+
+    def __update_progress(self, progress):
+        #print(progress, end="")
+        print('\r[{0:10}]{1:>2}%'.format('#' * int(progress * 10 / 100), progress), end='')

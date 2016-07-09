@@ -6,12 +6,15 @@ class Main:
     xlxs_doc = 'translation2.xlsx'
     json_doc = 'data.json'
     json_doc_new = 'data_new.json'
-    json_doc_new = 'data_new.json'
     sheet_name = 'sheet1'
+    searchcolumn = 5
+    replacecolumn = 6
+
     blacklist = ['']
 
     def __init__(self):
-        sar = Sar(self.xlxs_doc, self.json_doc,self.json_doc_new, self.sheet_name, self.blacklist)
+        sar = Sar(self.xlxs_doc, self.json_doc, self.json_doc_new, self.sheet_name, self.searchcolumn,
+                  self.replacecolumn, self.blacklist)
 
 
 start_time = time.time()
