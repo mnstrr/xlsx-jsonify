@@ -7,13 +7,14 @@ class Main:
     json_doc = 'data.json'
     json_doc_new = 'data_new.json'
     sheet_name = 'sheet1'
+    startrow = 2
     searchcolumn = 5
-    replacecolumn = 6
+    replacecolumn = 9
 
     blacklist = ['']
 
     def __init__(self):
-        sar = Sar(self.xlxs_doc, self.json_doc, self.json_doc_new, self.sheet_name, self.searchcolumn,
+        sar = Sar(self.xlxs_doc, self.json_doc, self.json_doc_new, self.sheet_name, self.startrow, self.searchcolumn,
                   self.replacecolumn, self.blacklist)
 
 

@@ -6,11 +6,12 @@ import warnings
 
 
 class SearchAndReplace:
-    def __init__(self, xlsx_doc, json_doc, json_doc_new, sheet_name, searchcolumn, replacecolumn, blacklist):
+    def __init__(self, xlsx_doc, json_doc, json_doc_new, sheet_name, startrow, searchcolumn, replacecolumn, blacklist):
         self.__xlsx_doc = xlsx_doc
         self.__json_doc = json_doc
         self.__json_doc_new = json_doc_new
         self.__sheet_name = sheet_name
+        self.__startrow = startrow
         self.__searchcolumn = searchcolumn
         self.__replacecolumn = replacecolumn
         self.__blacklist = blacklist
@@ -31,7 +32,7 @@ class SearchAndReplace:
         self.__crawlexcel()
 
         output_file = codecs.open(self.__json_doc_new, "w", encoding="utf8")
-        json.dump(self.__newdata, output_file, indent=4, sort_keys=True, ensure_ascii=False)
+        json.dump(self.__newdata, output_file, indent=2, ensure_ascii=False)
 
         print(' New jsonfile \"' + self.__json_doc_new + '" was created. ' + str(
             self.__counter) + ' substitutions in total.')
@@ -42,7 +43,7 @@ class SearchAndReplace:
         wb = openpyxl.load_workbook(self.__xlsx_doc)
         sheet = wb.get_sheet_by_name(self.__sheet_name)
 
-        for rowNum in range(2, sheet.max_row):  # skip the first row
+        for rowNum in range(self.__searchcolumn, sheet.max_row):  # skip the first row
             progress = int(round((rowNum / (sheet.max_row - 2)) * 100))
             self.__update_progress(progress)
             text = sheet.cell(row=rowNum, column=self.__searchcolumn).value
@@ -55,7 +56,8 @@ class SearchAndReplace:
     def __checkdict(self, collection, k, v):
         collectiontemp = collection
         for index in collectiontemp.keys():
-            collectiontemp[index] = self.__checkitem(collectiontemp, k, v, index)
+            if "href" not in index:
+                collectiontemp[index] = self.__checkitem(collectiontemp, k, v, index)
         return collectiontemp
 
     def __checklist(self, collection, k, v):
@@ -67,6 +69,7 @@ class SearchAndReplace:
     def __checkitem(self, collection, k, v, index):
         collectiontemp = collection
         item = collectiontemp[index]
+
         if type(item) is str:
             if ftfy.fix_encoding(item).lower().replace(" ", "").replace("\"", "") == k:
                 self.__counter += 1
